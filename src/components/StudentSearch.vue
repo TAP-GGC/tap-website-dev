@@ -2,7 +2,7 @@
 import { computed, ref, watchEffect, watch } from "vue";
 import "agnostic-vue/dist/index.css";
 import "agnostic-vue/dist/common.min.css";
-import { Input, Select, Button } from "agnostic-vue";
+import { Input, Select, Button, Disclose, Tag } from "agnostic-vue";
 import Pagination from "./Pagination.vue";
 
 import StudentCard from "./StudentCard.vue";
@@ -14,102 +14,131 @@ const props = defineProps({
 });
 
 const students = props.studentList;
+//basic search
 const search_text = ref("");
-const name = props.filter?.name ? ref([props.filter.name]) : ref(['Any']);
-const graduationYear = props.filter?.graduationYear ? ref([props.filter.graduationYear]) : ref(['Any']);
-const projects = props.filter?.projects ? ref([props.filter.projects]) : ref(['Any']);
+// advance search = desc, graduationYear, projects, tags, skills
+const showAdvanced = ref(false);
+const advancedTerm = ref("");
+const advancedSearchTags = ref([]); 
 
+function addAdvancedTag() {
+    const term = advancedTerm.value.trim().toLowerCase();
+    if (term && !advancedSearchTags.value.includes(term)) {
+        advancedSearchTags.value.push(term);
+    }
+    advancedTerm.value = "";
+}
+function removeAdvancedTag(index) {
+advancedSearchTags.value.splice(index, 1);
+}
+
+// Keyword suggestions for advanced search (NOT including name)
+const keywordOptions = computed(() => {
+    const set = new Set();
+    students.forEach(s => {
+        const d = s?.data || {};
+        if (d.graduationYear != null) {
+            set.add(String(d.graduationYear).toLowerCase());
+        }
+        if (d.projects){
+            d.projects.forEach(p => 
+                set.add(String(p).toLowerCase())
+            );
+        }
+        if (d.tags){
+            d.tags.forEach(t => 
+                set.add(String(t).toLowerCase())
+            );
+        }
+        if (d.skills){
+            d.skills.forEach(t => 
+                set.add(String(t).toLowerCase())
+            );
+        }
+    });
+    return Array.from(set);
+});
+
+//Matching keyword
+function basicMatches(student) {
+    const q = search_text.value.trim().toLowerCase();
+    if (!q) {
+        return true;
+    }
+    const d = student?.data || {};
+    return d.name && String(d.name).toLowerCase().includes(q);
+}
+
+
+function advancedMatches(student) {
+    if (advancedSearchTags.value.length === 0) {
+        return true;
+    }
+    const d = student?.data || {};
+    const baskets = [
+        d.desc ? [String(d.desc).toLowerCase()] : [],
+        d.graduationYear != null ? [String(d.graduationYear).toLowerCase()] : [],
+        Array.isArray(d.projects) ? d.projects.map(p => String(p).toLowerCase()) : [],
+        Array.isArray(d.tags) ? d.tags.map(t => String(t).toLowerCase()) : [],
+        Array.isArray(d.skills) ? d.skills.map(t => String(t).toLowerCase()) : []
+    ];
+    return advancedSearchTags.value.every(term => baskets.some(list => list.some(v => v.includes(term))));
+}
+
+
+function matches(student) {
+    return basicMatches(student) && advancedMatches(student);
+}
 //Student pagination
 const currentPage = ref(1);
 const pageSize = ref(12);
 
-// Create options for dropdowns
-function createOptions(students, x) {
-    let optionSet = new Set();
-    optionSet.add("Any");
-    students.forEach(arrayContainer => {
-        if (Array.isArray(arrayContainer.data[x])) {
-            arrayContainer.data[x].forEach(element => {
-                optionSet.add(element);
-            });
-        } else {
-            optionSet.add(arrayContainer.data[x]);
-        }
+// Sorting: name or graduationYear
+const sortField = ref("name");
+const sortAsc = ref(true);
+const filteredAndSortedStudents = computed(() => {
+    const filtered = students.filter(s => matches(s));
+    return [...filtered].sort((a, b) => {
+        let A = a?.data?.[sortField.value];
+        let B = b?.data?.[sortField.value];
+        if (typeof A === "string") A = A.toLowerCase();
+        if (typeof B === "string") B = B.toLowerCase();
+        if (A < B) return sortAsc.value ? -1 : 1;
+        if (A > B) return sortAsc.value ? 1 : -1;
+        return 0;
     });
-    return Array.from(optionSet).map(option => ({ value: option, label: option }));
-}
-
-// Generate options for dropdowns
-const yearOptions = createOptions(students, "graduationYear"); 
-const nameOptions = createOptions(students, "name"); 
-const projectOptions = createOptions(students, "projects"); // Use relatedProjectIds for projects
-
-// Matches function to filter students based on search criteria
-function matches(student) {
-    let isMatch = false;
-
-    // Check if any filter is active (search text or dropdowns)
-    if (search_text.value || graduationYear.value != 'Any' || projects.value != 'Any' || name.value != 'any') {
-
-        // Check filters (dropdown menus)
-        // If dropdown value does not match student data, return false immediately
-        if (student.data?.name && name.value != 'Any' && !name.value.includes(student.data.name)) {
-            return false;
-        }
-        if (student.data?.graduationYear && graduationYear.value != 'Any' && !graduationYear.value.includes(student.data.graduationYear.toString())) {
-            return false;
-        }
-        if (student.data?.projects && projects.value != 'Any' && !projects.value.some(project => student.data.projects.includes(project))) {
-            return false;
-        }
-
-        let searchText = search_text.value.toLowerCase();
-        
-        // If no search text is provided, pass the filtering based on dropdown values
-        if (searchText == '') {
-            return true;
-        } else {
-            // Check if student matches the search text (by name, projects, etc.)
-            if (
-                (student.data?.name && student.data.name.toLowerCase().includes(searchText))||
-                (student.data?.desc && student.data.desc.toLowerCase().includes(searchText))||
-                (student.data?.graduationYear && student.data.graduationYear.toString().includes(searchText)) ||
-                (student.data?.projects && student.data.projects.some(project => project.toLowerCase().includes(searchText)))
-            ) {
-                return true;
-            } else {
-                return false;
-            }
-        }
-    }
-
-    // If no filters are active, return true
-    return true;
-}
-
-// Compute filtered students based on matching criteria
-const filteredStudents = computed(() => {
-    return students.filter((student) => matches(student));
 });
+
+function toggleSortDirection() { 
+    sortAsc.value = !sortAsc.value; 
+}
 
 const paginatedStudents = ref([]);
 
 watchEffect(() => {
   const start = (currentPage.value - 1) * pageSize.value;
   const end = start + pageSize.value;
-  paginatedStudents.value = filteredStudents.value.slice(start, end);
+  paginatedStudents.value = filteredAndSortedStudents.value.slice(start, end);
 });
 
 // Clamp current page when result size or pageSize changes
-watch([filteredStudents, pageSize], () => {
+watch([filteredAndSortedStudents, pageSize], () => {
   if (currentPage.value > totalPages.value) {
     currentPage.value = totalPages.value;
   }
 });
 
 const totalPages = computed(() =>
-  Math.max(1, Math.ceil((filteredStudents.value.length || 0) / (pageSize.value || 1)))
+  Math.max(1, Math.ceil((filteredAndSortedStudents.value.length || 0) / (pageSize.value || 1)))
 );
+
+// Reset to page 1 when search/sort change
+watch([
+    search_text,
+    () => advancedSearchTags.value.length,
+    sortField, sortAsc,
+    () => props.studentList
+], () => { currentPage.value = 1; }, { deep: true });
 
 const base = import.meta.env.BASE_URL;
 </script>
@@ -120,63 +149,52 @@ const base = import.meta.env.BASE_URL;
 
             <!-- Input for searching students -->
             <Input id="7" is-underlined is-underlined-with-background 
-                placeholder="Enter student name, graduation year or related projects" 
+                placeholder="Enter student name ..." 
                 label="Search for students" 
                 type="text" 
                 v-model="search_text" />
 
-            <!-- Filter dropdowns -->
-            <div class="student-filter-container">
-                
-                <!-- Name Filter -->
-                <div class="student-filter-dropdown">
-                    <label>Student Name:</label>
-                    <Select 
-                        unique-id="name" 
-                        :options="nameOptions" 
-                        :is-multiple="true" 
-                        :multiple-size="3" 
-                        @selected="(value) => { name = value }">
-                    </Select>
-                </div>
+            <!-- ADVANCED SEARCH (tags) -->
+            <Disclose :is-open="showAdvanced" title="🔍 Advanced Search">
+                <Input
+                    v-model="advancedTerm"
+                    @keydown.enter.prevent="addAdvancedTag"
+                    list="student-keyword-list"
+                    placeholder="Type a keyword (description, graduation year, project, or skill), then press Enter"
+                    class="w-full mb-2"
+                />
+                <datalist id="student-keyword-list">
+                    <option v-for="opt in keywordOptions" :key="opt" :value="opt" />
+                </datalist>
 
-                <!-- Graduation Year Filter -->
-                <div class="student-filter-dropdown">
-                    <label>Graduation Year:</label>
-                    <Select 
-                        unique-id="grad-year" 
-                        :options="yearOptions" 
-                        :is-multiple="true" 
-                        :multiple-size="3" 
-                        @selected="(value) => { graduationYear = value }">
-                    </Select>
+                <div class="flex flex-wrap gap-2 mt-1">
+                    <Tag
+                        v-for="(tag, i) in advancedSearchTags"
+                        :key="tag + i"
+                        class="mie6"
+                        shape="round"
+                        type="success"
+                        is-uppercase
+                    >
+                        {{ tag }}
+                        <button @click="removeAdvancedTag(i)" class="delete">&#x2718;</button>
+                    </Tag>
                 </div>
-
-                <!-- Project Filter -->
-                <div class="student-filter-dropdown">
-                    <label>Related Projects:</label>
-                    <Select 
-                        unique-id="projects" 
-                        :options="projectOptions" 
-                        :is-multiple="true" 
-                        :multiple-size="3" 
-                        @selected="(value) => { projects = value }">
-                    </Select>
-                </div>
-
-                <!-- Reset Button -->
-                <div class="student-filter-dropdown">
-                    <a :href="`${base == '/' ? '' : base}/students`">
-                        <Button mode="primary" isRounded>Reset</Button>
-                    </a>
-                </div>
+            </Disclose>
+            
+            <!-- SORTING -->
+            <div class="d-flex align-items-center mt-3 mb-3">
+                <label class="me-2">Sort by:</label>
+                <select v-model="sortField" class="form-select me-2" style="width: auto;">
+                    <option value="name">Name</option>
+                    <option value="graduationYear">Graduation Year</option>
+                </select>
+                <Button variant="ghost" @click="toggleSortDirection">{{ sortAsc ? "↑ Ascending" : "↓ Descending" }}</Button>
             </div>
-
-        </section>
+        </section>            
 
         <!-- Display selected or all students -->
-        <h3>{{ ((search_text || !name.includes('Any') || !graduationYear.includes('Any') || !projects.includes('Any')) ? 
-            `Filtered students` : 'All Students') }} ({{ filteredStudents.length }})</h3>
+        <h3>{{ ((search_text || advancedSearchTags.length) ? `Filtered students` : 'All Students') }} ({{ filteredAndSortedStudents.length }})</h3>
 
         <!-- Display Student Cards for filtered students -->
         <section class="mbe40 project-cards-flex flex flex-row flex-grow-1 flex-shrink-1 flex-wrap flex-fill">
@@ -187,7 +205,7 @@ const base = import.meta.env.BASE_URL;
 
         <Pagination
             v-model:currentPage="currentPage"
-            :totalItems="filteredStudents.length"
+            :totalItems="filteredAndSortedStudents.length"
             :pageSize="pageSize"
         />
     </div>
