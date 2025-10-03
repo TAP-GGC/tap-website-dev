@@ -22,7 +22,8 @@ import { Input } from "agnostic-vue";
 import Crumbs from '../components/Crumbs.vue';
 import { getCollection } from 'astro:content';
 import FacultySearch from '../components/FacultySearch.vue';
-const instructors = await getCollection('instructors');
+import facultyIds from '../components/astro/FacultyIds';
+const instructors = Object.values(facultyIds);
 ---
 <TAPDefaultLayout title="TAP Instructors">
 

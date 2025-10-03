@@ -1,6 +1,6 @@
 <script setup>
 import { computed, ref } from 'vue';
-import { Input, Select, Button} from 'agnostic-vue';
+import { Input, Select, Button, Disclose, Tag} from 'agnostic-vue';
 import "agnostic-vue/dist/index.css";
 import "agnostic-vue/dist/common.min.css";
 
@@ -15,68 +15,65 @@ const props = defineProps({
 // Reactive references for search inputs
 const instructors = props.instructorList; 
 const search_text = ref("");
-const name =  props.filter?.name ? ref([props.filter.name]) : ref(['Any']);
-const projects = props.filter?.projects ? ref([props.filter.projects]) : ref(['Any']);
+// advanced search for related projects (tag-based)
+const showAdvanced = ref(false);
+const advancedTerm = ref("");
+const advancedSearchTags = ref([]);
 
-// Generate unique options for the project dropdown based on projectList
-function createOptions(instructors,x) {
-    let optionSet = new Set();
-    optionSet.add("Any");
-    instructors.forEach(arrayContainer => {
-        if (Array.isArray(arrayContainer.data[x])) {
-            arrayContainer.data[x].forEach(element => {
-                optionSet.add(element);
-            });
-        } else {
-            optionSet.add(arrayContainer.data[x]);
-        }
+function addAdvancedTag() {
+    const term = advancedTerm.value.trim().toLowerCase();
+    if (term && !advancedSearchTags.value.includes(term)) {
+        advancedSearchTags.value.push(term);
+    }
+    advancedTerm.value = "";
+}
+function removeAdvancedTag(i) {
+    advancedSearchTags.value.splice(i, 1);
+}
+
+// Suggestions for related projects
+const keywordOptions = computed(() => {
+    const set = new Set();
+    instructors.forEach(s => {
+        const projectList = Array.isArray(s.relatedProjects) ? s.relatedProjects : [];
+        projectList.forEach(p => {
+            const title = (p?.title ?? "").toString().trim();
+            //const pid = (p?.id ?? "").toString().trim();
+            if (title) set.add(title.toLowerCase());
+            //if (pid) set.add(pid.toLowerCase()); 
+        });
     });
-    return Array.from(optionSet).map(option => ({ value: option, label: option }));
-}
-// Generate options for dropdowns
-const nameOptions = createOptions(instructors, "name"); 
-const projectOptions = createOptions(instructors, "projects");
-
-// Filter faculty based on name and projectList
-function matches(faculty) {
-    let isMatch = false;
-    // Check if any filter is active (search text or dropdowns)
-if (search_text.value || name.value != 'Any' || projects.value != 'Any') {
-
-    if (faculty.data?.name && name.value != 'Any' && !name.value.includes(faculty.data.name)) {
-        return false;
-    }
-    if (faculty.data?.projects && projects.value != 'Any' && !projects.value.some(project => faculty.data.projects.includes(project))) {
-        return false;
-    }
-
-    let searchText = search_text.value.toLowerCase();
-
-    // If no search text is provided, pass the filtering based on dropdown values
-    if (searchText == '') {
-        return true;
-    } else {
-        // Check if faculty matches the search text (by name, projects, etc.)
-        if (
-            (faculty.data?.name && faculty.data.name.toLowerCase().includes(searchText)) ||
-            (faculty.data?.desc && faculty.data.desc.toLowerCase().includes(searchText))||
-            (faculty.data?.projects && faculty.data.projects.some(project => project.toLowerCase().includes(searchText)))
-        ) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-}
-
-// If no filters are active, return true
-return true;
-}
-
-// Compute filtered students based on matching criteria
-const filteredInstructors = computed(() => {
-    return instructors.filter((faculty) => matches(faculty));
+    return Array.from(set);
 });
+
+function basicMatches(faculty) {
+    const q = search_text.value.trim().toLowerCase();
+    if (!q) return true;
+    const d = faculty?.data || {};
+    return !!(d.name && String(d.name).toLowerCase().includes(q));
+}
+
+function advancedMatches(faculty) {
+    if (advancedSearchTags.value.length === 0) return true;
+    const rel = Array.isArray(faculty.relatedProjects) ? faculty.relatedProjects : [];
+
+    // Build candidate strings per project
+    const baskets = rel.map(p => {
+        const title = (p?.title ?? "").toString().toLowerCase();
+        const pid = (p?.id ?? "").toString().toLowerCase();
+        return [title, pid].filter(Boolean);
+    });
+
+    // Every tag must match at least one value in any basket
+    return advancedSearchTags.value.every(term =>
+        baskets.some(arr => arr.some(v => v.includes(term)))
+    );
+}
+
+const filteredInstructors = computed(() =>
+    instructors.filter(f => basicMatches(f) && advancedMatches(f))
+);
+
 const base = import.meta.env.BASE_URL;
 
 </script>
@@ -87,50 +84,42 @@ const base = import.meta.env.BASE_URL;
 
             <!-- Input for searching faculty -->
             <Input id="faculty-search" is-underlined is-underlined-with-background 
-                placeholder="Enter faculty name, related projects..." 
+                placeholder="Enter faculty name ..." 
                 label="Search for faculty" 
                 type="text" 
                 v-model="search_text" />
 
-            <!-- Filter dropdowns -->
-            <div class="faculty-filter-container">
+            <!-- ADVANCED: projects taught -->
+            <Disclose :is-open="showAdvanced" title="🔍 Advanced Search">
+                <Input
+                    v-model="advancedTerm"
+                    @keydown.enter.prevent="addAdvancedTag"
+                    list="faculty-keyword-list"
+                    placeholder="Type a project keyword, then press Enter"
+                    class="w-full mb-2"
+                />
+                <datalist id="faculty-keyword-list">
+                    <option v-for="opt in keywordOptions" :key="opt" :value="opt" />
+                </datalist>
 
-                <!-- Name Filter -->
-                <div class="faculty-filter-dropdown">
-                    <label>Name:</label>
-                    <Select 
-                        unique-id="name" 
-                        :options="nameOptions" 
-                        :is-multiple="true" 
-                        :multiple-size="3" 
-                        @selected="(value) => { name = value }">
-                    </Select>
+                <div class="flex flex-wrap gap-2 mt-1">
+                    <Tag
+                        v-for="(tag, i) in advancedSearchTags"
+                        :key="tag + i"
+                        class="mie6"
+                        shape="round"
+                        type="success"
+                        is-uppercase
+                    >
+                        {{ tag }}
+                        <button @click="removeAdvancedTag(i)" class="delete">&#x2718;</button>
+                    </Tag>
                 </div>
-                
-                <!-- Project Filter -->
-                <div class="faculty-filter-dropdown">
-                    <label>Related Projects:</label>
-                    <Select 
-                        unique-id="projects" 
-                        :options="projectOptions" 
-                        :is-multiple="true" 
-                        :multiple-size="3" 
-                        @selected="(value) => { projects = value }">
-                    </Select>
-                </div>
-
-                <!-- Reset Button -->
-                <div class="faculty-filter-dropdown">
-                    <a :href="`${base == '/' ? '' : base}/instructors`">
-                        <Button mode="primary" isRounded>Reset</Button>
-                    </a>
-                </div>
-            </div>
-
+            </Disclose>
         </section>
 
         <!-- Display selected or all faculty -->
-        <h3>{{ ((search_text|| !name.includes('Any')|| !projects.includes('Any')) ? 
+        <h3>{{ ((search_text|| advancedSearchTags.length) ? 
             `Filtered instructors` : 'All instructors') }} ({{ filteredInstructors.length }})</h3>
 
         <!-- Display Faculty Cards for filtered faculty -->
