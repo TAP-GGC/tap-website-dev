@@ -293,6 +293,9 @@
         "Yhsyd",
         "yorke",
         "Zuberi"
+    ],
+    "githubPullRequests.ignoredPullRequestBranches": [
+        "main"
     ]
 
 }

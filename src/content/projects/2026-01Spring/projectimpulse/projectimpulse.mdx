@@ -1,48 +1,150 @@
 ---
-shortTitle: "Project Impulse"
-title: "AI Voice-Controlled Spring-Powered Jumping Robot"
-id: "project-impulse"
+shortTitle: Project Impulse
+title: AI Controlled Spring Powered Jumping Robot
+id: project-impulse
 
-desc: "Project Impulse is a compact spring-powered jumping robot designed to simulate a human foot-like launch mechanism. The robot uses a motor-driven winch system to compress high-force springs and release stored energy for controlled vertical jumps. A 3D-printed frame and linear rail system ensure stable and repeatable motion. The system is powered by a LiPo battery and controlled using a Raspberry Pi Pico, with a BTS7960 motor driver handling high-current motor control. A buck converter regulates voltage for safe electronics operation. Future enhancements include AI voice-based control using a Raspberry Pi Zero 2W, directional movement using servo-actuated joints, and stabilization/turning using ducted fans."
+imageLogoLight: ./Theta_staticFace.png
+imageLogoDark: ./Theta_staticFace.png
+imageTeam: ./projectImpulseTeamPhoto.png
 
-github: "https://github.com/TAP-GGC/Project-Impulse"
+desc: Teaching robotics, AI control systems, and spring-powered jumping mechanics with Project Impulse.
+github: https://github.com/TAP-GGC/Project-Impulse
 
-students:
-  - "christian-bacon"
-  - "tia-best"
-  - "eyob-kabeto"
+students: [
+        christian-bacon,
+        tamisha-best,
+        eyob-kabeto
+]
 
-instructors:
-  - "xin-xu"
-  - "wei-jin"
+instructors: [
+        xin-xu,
+        wei-jin
+]
 
-techs:
-  - "Raspberry Pi Pico"
-  - "BTS7960 motor driver"
-  - "DC gear motor"
-  - "Servo motors"
-  - "compression springs"
-  - "limit switches"
-  - "3D printing"
+techs: [
+        "raspberry-pi",
+        "bts7960-motor-driver",
+        "dc-gear-motor",
+        "servo-motors",
+        "compression-springs",
+        "limit-switches",
+        "3d-printing"
+]
 
-events:
-  - "tap expo"
+videos: []
+events: [
+        "tap-expo",
+        "asf-piedmont-park",
+        "sst-stars-event",
+        "norcross-cluster-innovation-showcase",
+        "creates-conference"
+]
 
-semester: "Spring"
+semester: spring
 year: 2026
 
-levels:
-  - "college"
+levels: [
+        "college"
+]
 
-difficulty:
-  - "intermediate"
-  - "advanced"
+difficulty: [
+        "intermediate",
+            "advanced"
+]
 
-durationMins:
-  - 60
-  - 90
+durationMins: [
+        60,
+            90
+]
 
 publishedDate: 2026-04-16
+relatedIds: []
 
-imageLogoLight: "./robot.jpeg"
+
+curator: [
+        
+]
+
 ---
+
+import { Image } from "astro:assets";
+import Photo from '/src/components/astro/Photo.astro';
+import Logo from '/src/components/astro/Logo.astro';
+import teamPhoto from './projectImpulseTeamPhoto.png';
+
+import servoMotor from './servo_motor.png';
+import thetaFace from './Theta_staticFace.png';
+
+
+{/* Project Description */}
+
+Project Impulse is an AI-controlled spring-powered jumping robot designed to demonstrate how artificial intelligence, robotics, and mechanical engineering can work together in a real-world system. The robot uses a motor-driven spring compression system to store energy and launch itself vertically into the air. Our project combines electronics, programming, 3D printing, and mechanical design into one interactive robotics platform.
+
+The workshop teaches participants how AI can interact with physical hardware systems using simple electronic circuits and voice-controlled software. Students will learn how circuits work, how robotics systems are controlled, and how AI can communicate with hardware components in real time.
+
+Project Impulse also demonstrates how modern technologies such as Raspberry Pi controllers, motor drivers, servo systems, and 3D printed parts can be combined to build custom robotics projects from scratch.
+
+The Technology Ambassador Program at [GGC](http://www.ggc.edu/tap) strives to break misconceptions about the IT field by providing engaging and hands-on workshops for students of all backgrounds. TAP students create interactive projects that encourage interest in STEM, engineering, robotics, and computer science.
+
+<p align="center">
+  <video width="500" controls autoplay muted loop>
+    <source src="/videos/Commercial_TMNT.mp4" type="video/mp4" />
+  </video>
+</p>
+
+## Team Members
+
+<Photo src={teamPhoto.src} alt="Project Impulse Team Photo" caption="From left to right: Christian Bacon, Eyob Kabeto, and Tamisha (Tia) Best"/>
+
+<br />
+
+## Outreach Activities
+
+1. TAP Expo, March 6, 2026, Georgia Gwinnett College: Promoted the IT field and demonstrated Project Impulse to college students.
+
+2. ASF @ Piedmont Park, March 21, 2026, Piedmont Park, Atlanta: Demonstrated the robot and AI systems to children and families interested in STEM and robotics.
+
+3. SST STaRS Event, April 24, 2026, Georgia Gwinnett College: Presented the semester-long project and demonstrated AI-controlled robotics.
+
+4. Norcross Cluster Innovation Showcase, April 25, 2026, Downtown Norcross: Showcased Project Impulse and explained the engineering and AI systems used in the robot.
+
+5. The 26th CREATES Conference, May 1, 2026, Georgia Gwinnett College: Demonstrated Project Impulse during the research and innovation showcase event.
+
+## Impulse
+
+<p align="center">
+  <video
+    width="350"
+    controls
+    autoplay
+    muted
+    loop
+    playsinline
+    preload="auto">
+    <source src="/videos/impulsejump.MP4" type="video/mp4" />
+  </video>
+</p>
+
+Project Impulse is a jumping robot that stores energy using large compression springs. A DC gear motor acts like a winch and slowly pulls fishing line to compress the springs, similar to clicking and compressing a pen.
+
+As the motor tightens the line, the springs become more compressed and store more energy. Once the springs are fully compressed, a limit switch is triggered. This tells the robot to stop the motor so the springs are not over-compressed.
+
+Next, a servo motor rotates about 13 degrees to lock and hold the compressed spring mechanism in place. After the servo locks the system, the motor slightly unwinds the fishing line to create slack. This is important because it prevents the motor and winch from resisting the jump.
+
+When the robot is ready to jump, the servo quickly moves out of the way and releases the stored spring force all at once. The springs rapidly expand and launch the robot upward into the air.
+
+The Raspberry Pi Pico acts as the brain of the robot and controls the motor driver, servo motor, and limit switches during the entire jumping sequence.
+
+<p align="center">
+  <video width="900" controls>
+    <source src="/videos/ProjectImpulse.mp4" type="video/mp4" />
+  </video>
+</p>
+
+In our workshop, participants will first learn how to build a simple LED circuit using an Arduino Uno, breadboard, jumper wires, resistors, and LEDs. Students will learn how electricity flows through the circuit and how basic electronic components work together.
+
+After building the circuit, participants will connect it to Delta, our AI assistant inspired by Theta. Delta can control the LEDs using commands such as turning the light on or off, blinking the light quickly, or blinking it slowly. This helps demonstrate how artificial intelligence can interact with real hardware systems in real time.
+
+Participants will also be encouraged to experiment and make the project more challenging by adding additional LEDs, creating different blinking patterns, or even connecting buttons and switches to create more advanced interactions.
+
+The goal of the workshop is to show that robotics, AI, and electronics can be fun, creative, and beginner-friendly while inspiring curiosity about engineering and technology. Go to our github for more information.
