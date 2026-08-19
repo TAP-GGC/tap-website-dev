@@ -1,0 +1,47 @@
+---
+title: TAP Project Pi-Ai Featured in Atlanta News
+id: pi-ai-news
+semester: spring
+year: 2026
+slug: pi-ai-news-spring26
+tags: [nsf, tap-expo]
+eventDate: "2026-05-06T14:00:00Z"
+projects: [ pi---ai ]
+instructors: [ "xin-xu", "wei-jin",]
+students: [ 
+    "Keyvaun-Herring",
+    "lorena-salazar",
+    "kyla-thorpe" ]
+imageEvent: ./pi-ai-news-logo-long.png
+images: [ 
+    { src: "./pi-ai-team-news-picture.png", alt: 'Pi-Ai team' }, 
+    { src: "./pi-ai-news-logo.png", alt: 'Kyla explaining' }, 
+    { src: "./pi-ai-news-logo-long.png", alt: 'Kyla explaining on ANF website' }, 
+    ]
+desc: As students cram for finals, Georgia Gwinnett students create AI app designed to simplify learning.
+---
+import { Image } from "astro:assets";
+
+import Photo from '/src/components/astro/Photo.astro';
+import Logo from '/src/components/astro/Logo.astro';
+import Gallery from '/src/components/astro/Gallery.astro';
+import Clip from '/src/components/astro/Clip.astro';
+import ProjectCard from '/src/components/ProjectCard.vue';
+import projectIds from '/src/components/astro/ProjectIds.js';
+
+import teamPhoto from "./pi-ai-team-news-picture.png"
+
+# TAP Project Pi-Ai Featured in Atlanta News
+<br>
+<a href="https://www.atlantanewsfirst.com/2026/05/05/students-cram-finals-georgia-gwinnett-students-create-ai-app-designed-simplify-learning/"
+   target="_blank"> Open original article </a>
+<Photo src={teamPhoto.src} alt="" 
+       link="https://www.atlantanewsfirst.com/2026/05/05/students-cram-finals-georgia-gwinnett-students-create-ai-app-designed-simplify-learning/" />  
+
+</br>
+
+
+
+
+
+
