@@ -206,7 +206,7 @@ const papersCollection = defineCollection({
       message: "Image too large! Convert images to be less than 150 pixels wide.",
     }).optional(),
     abstract: z.string().optional(),
-    paperLink: z.string(),
+    paperLink: z.string()
   })
 });
 

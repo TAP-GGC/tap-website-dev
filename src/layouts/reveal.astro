@@ -1,0 +1,60 @@
+---
+// Reveal.js imports
+import 'reveal.js/reveal.css';
+import 'reveal.js/theme/black.css';
+
+let title = `${Astro.props.title} - GGC Technology Ambassadors Program`;
+let description = `${Astro.props.description}`;
+---
+<html>
+  <head>
+    <meta charset="UTF-8">
+	<meta name="keywords" content="k-12, college, outreach, technology, fun, enagaging, coding, programming, undergraduate">
+	<meta name="description" content={description}>
+	<meta name="author" content="Technology Ambassadors Program (TAP)">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>{title}</title>
+
+    <!--link rel="stylesheet" href="dist/reveal.css" />
+    <link rel="stylesheet" href="dist/theme/white.css" /-->
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <section data-markdown>
+          <textarea data-template>
+            <slot />
+          </textarea>
+        </section>
+      </div>
+    </div>
+    <script>
+        import Reveal from 'reveal.js';
+        import Markdown from 'reveal.js/plugin/markdown';
+        import RevealHighlight from 'reveal.js/plugin/highlight';
+
+        // Check if reveal 
+        let deck = new Reveal({
+
+        plugins: [Markdown, RevealHighlight],
+
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280, // 960
+        height: 720, // 700
+
+        // Factor of the display size that should remain empty around the content
+        margin: 0.1,
+        
+        // Link to each page
+        history: true,
+
+        // Bounds for smallest/largest possible scale to apply to content
+        minScale: 0.2,
+        maxScale: 1.5,
+        });
+        deck.initialize();
+    </script>
+  </body>
+</html>
