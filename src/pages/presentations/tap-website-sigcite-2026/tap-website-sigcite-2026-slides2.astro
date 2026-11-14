@@ -3,8 +3,8 @@
 import 'reveal.js/reveal.css';
 import 'reveal.js/theme/black.css';
 
-let title = `${Astro.props.title} - GGC Technology Ambassadors Program`;
-let description = `${Astro.props.description}`;
+let title = `SIGCITE 2026 Presentation - GGC Technology Ambassadors Program`;
+let description = `An Online Repository of Technology Outreach Projects`;
 ---
 <html>
   <head>
@@ -40,6 +40,7 @@ let description = `${Astro.props.description}`;
             ## Why an Outreach Repository?
 
             - Hands-on activities help introduce technology concepts.
+            - Service learning course under Technology Ambassadors Program (TAP).
             - Students develop new outreach projects every semester.
             - Existing projects represent a valuable educational resource.
 
@@ -51,18 +52,28 @@ let description = `${Astro.props.description}`;
 
             ## The Problem
 
-            - Materials stored in D2L.
+            - Materials stored in private LMS (BrightSpace D2L).
             - Distributed across courses and instructors.
             - Limited public accessibility.
             - Difficult to discover and reuse previous projects.
 
             ---
 
+            ## Related Work
+
+            - [CS Unplugged](https://csunplugged.org/en/) - offline activities for teaching computer science concepts.
+            - [BPCnet.org](https://bpcnet.org/) - repository of outreach activities for broadening participation in computing (discontinued).
+            - [CSforAll](https://csforall.org/) - resources for expanding computer science education.
+            - [Code.org](https://code.org/) - free curriculum and tools that help teachers build digital fluency.
+            - And other smaller projects and repositories.
+
+            ---
+
             ## Our Solution
 
-            ### A public repository of outreach projects
+            A public repository of outreach projects: [https://tapggc.org](https://tapggc.org)
 
-            [https://tapggc.org](https://tapggc.org)
+            <iframe src="https://tapggc.org" width="100%" height="600px"></iframe>
 
             ---
 
@@ -77,6 +88,10 @@ let description = `${Astro.props.description}`;
 
             ---
 
+            ![](/presentations/sigcite2026/outreach_repository_architecture.svg) <!-- .element: height="700px" -->
+
+            ---
+
             ## Adding a New Project
 
             1. Create a project folder.
@@ -87,13 +102,45 @@ let description = `${Astro.props.description}`;
 
             ---
 
+            ![](/presentations/sigcite2026/outreach_repository_folders.svg) <!-- .element: height="700px" style="background-color: white;" -->
+
+            ---
+            ## Projects
+
+            ![](/presentations/sigcite2026/tap-website-projects.png) <!-- .element: height="600px" -->
+
+            ---
+            ## Project metadata
+
+            ![](/presentations/sigcite2026/tap-website-project-jedi-crop.png) <!-- .element: height="600px" -->
+
+            ---
+            ## Metadata allows relational structure
+
+            - List of all [projects](https://tapggc.org/projects)
+            - List of all [students](https://tapggc.org/students) and [instructors](https://tapggc.org/instructors), linked to their projects
+            - Blog support of Astro allows list of all publications, awards, news, etc
+
+            ---
+            ## Full project page
+
+            <iframe src="https://tapggc.org/projects/2023/fall/jedi-sphero/" width="100%" height="600px"></iframe>
+
+            ---
+            ## More in project's GitHub repository 
+
+            ![](/presentations/sigcite2026/screenshot-jedi-sphero-github.png) <!-- .element: height="600px" -->
+            ---
+
             ## Results
 
-            ### 40+ outreach activities
+            - 40+ outreach activities
+            - 14,000+ unique visitors
+            - 250,000+ requests
 
-            ### 14,000+ unique visitors
-
-            ### 250,000+ requests
+            ![](/presentations/sigcite2026/tapggc-org-Cloudflare-analytics-countries-aug-2026.png) <!-- .element: height="300px" style="background-color: white;" -->
+            
+            Cloudflare analytics for tapggc.org, August 2026
 
             ---
 
@@ -103,7 +150,35 @@ let description = `${Astro.props.description}`;
             - Make outreach activities publicly accessible.
             - Support adoption and reuse by educators.
 
+            ---
+            ## Future Work
+
+            - Continue to add new outreach projects; and simplify the process for students to contribute.
+            - Project rating and feedback system for educators to share their experiences with the activities.
+            - Accept contributions from other institutions.
+            - Add more metadata for better search and discovery.
+    
+            ---
+            ## Thanks to:
+
+            - TAP [students](https://tapggc.org/students) and [instructors](https://tapggc.org/instructors) who contributed to the repository.
+            - GGC [School of Science and Technology](https://www.ggc.edu/academics/schools/school-of-science-and-technology) and [Department of Information Technology](https://www.ggc.edu/academics/degrees-and-programs/information-technology) for supporting TAP.
+            - And you for listening to our presentation!
+
+            ## Any questions?
+
+            <div style="width: 45%; margin: auto; text-align: center; display: inline-block; vertical-align: middle;">
+
             ### https://tapggc.org
+
+            </div>
+            <div style="width: 45%; margin: auto; text-align: center; display: inline-block; vertical-align: middle;">
+
+            ![](/presentations/sigcite2026/tapggcorg.png) <!-- .element: height="300px" style="background-color: white;" -->
+            
+            </div>
+            
+
             </textarea>
         </section>
       </div>
